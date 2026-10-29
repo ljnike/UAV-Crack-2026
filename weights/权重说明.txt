@@ -15,10 +15,21 @@ L4_unetd_100_best.pt          103.0 MB unetd_r34   1.0           0.1000
 H_swins_hi_best.pt            199.1 MB swin_s      1.25          0.2500
 H2_swins_15x_best.pt          199.1 MB swin_s      1.5           0.3000
 
-合计 5 个 .pt，约 899 MB；另附 MANIFEST.json（完整元数据）与本说明。
+合计 5 个 .pt（约 899 MB）+ 5 个 .onnx（约 916 MB），另附 MANIFEST.json（完整元数据）与本说明。
 
 【下载地址】
   百度网盘：https://pan.baidu.com/s/1Iu5rxPz44ByAOzEznl4Exg?pwd=1234  提取码 1234
+
+【ONNX 版本（比赛要求：PyTorch 模型需另附 ONNX）】
+  文件名                        大小      输入尺寸        对应 .pt
+  ST_A_best.onnx                203.2 MB  1x3x378x672     ST_A_best.pt
+  E_swins_prec_best.onnx        203.2 MB  1x3x378x672     E_swins_prec_best.pt
+  L4_unetd_100_best.onnx        102.7 MB  1x3x378x672     L4_unetd_100_best.pt
+  H_swins_hi_best.onnx          203.2 MB  1x3x472x840     H_swins_hi_best.pt
+  H2_swins_15x_best.onnx        203.2 MB  1x3x568x1008    H2_swins_15x_best.pt
+
+  输出节点 logits（未过 sigmoid，需自行 sigmoid 后再融合/阈值），opset 17。
+  与 PyTorch 前向的最大绝对误差 ≤ 8e-5；重新导出：python export_onnx.py --all
 
 【怎么用】
 1) 校验完整性（Windows PowerShell，逐条应输出相同哈希）：

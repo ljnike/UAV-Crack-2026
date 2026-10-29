@@ -1,4 +1,4 @@
-﻿# UAV-Crack-2026 · 2026 VLP 挑战赛参赛作品
+# UAV-Crack-2026 · 2026 VLP 挑战赛参赛作品
 
 长安大学人工智能创新大赛（2026）专项命题挑战赛 · **赛道 D：UAV-Crack 无人机路面裂缝分割**
 
@@ -66,7 +66,7 @@ data/UAV-Crack-dataset/
 ## 5. 复现（两步）
 
 ```bash
-# 步骤 1：各成员导出测试集概率（predictz.py 属训练代码包，见 src/）
+# 步骤 1：各成员导出测试集概率（每个成员用各自的尺度 + 翻转 TTA）
 python predictz.py --ckpt weights/ST_A_best.pt        --out sub/m1 --scales 0.85 1.0 1.15 --flip --save-probs sub/p_STA.npz
 python predictz.py --ckpt weights/E_swins_prec_best.pt --out sub/m2 --scales 0.85 1.0 1.15 --flip --save-probs sub/p_E.npz
 python predictz.py --ckpt weights/L4_unetd_100_best.pt --out sub/m3 --scales 1.0 --flip --save-probs sub/p_L4.npz
@@ -74,9 +74,17 @@ python predictz.py --ckpt weights/H_swins_hi_best.pt  --out sub/m4 --scales 1.25
 python predictz.py --ckpt weights/H2_swins_15x_best.pt --out sub/m5 --scales 1.5 --flip --save-probs sub/p_H2.npz
 
 # 步骤 2：logit 加权融合 + 阈值 + 后处理 + 打包自检
+#   原始实现（产出提交文件的那一条）：tools/ensemble_test.py
+python tools/ensemble_test.py --probs sub/p_STA.npz sub/p_E.npz sub/p_L4.npz sub/p_H.npz sub/p_H2.npz \
+    --weights 0.04667 0.30333 0.10 0.25 0.30 --logit \
+    --threshold 0.495 --min-size 64 --fg-value 1 \
+    --out-masks sub/masks_v4 --out-zip sub/result_v4.zip
+#   等价的精简版（含 AE 组合项与自检提示）：ensemble.py
 python ensemble.py --probs sub/p_STA.npz sub/p_E.npz sub/p_L4.npz sub/p_H.npz sub/p_H2.npz \
                    --config configs/ensemble.json --out result --zip result.zip
-python check_result.py --result result --data-root data/UAV-Crack-dataset --pack result.zip
+
+# 步骤 3：提交格式自检
+python check_result.py --result sub/masks_v4 --data-root data/UAV-Crack-dataset --pack result.zip
 ```
 
 `check_result.py` 逐项校验：300 个文件、672×378、取值 {0,1}、文件名与 val 一一对应、
@@ -92,9 +100,12 @@ python check_result.py --result result --data-root data/UAV-Crack-dataset --pack
 | `weights/H_swins_hi_best.pt` | 199.1 MB | `5a680ed72d2ac9c0` |
 | `weights/H2_swins_15x_best.pt` | 199.1 MB | `17471427b0dd98ce` |
 
+**ONNX 版本**（比赛要求：PyTorch 模型需另附 ONNX）：`weights/*.onnx` 共 5 个，约 916 MB，
+由 `export_onnx.py --all` 生成，输入尺寸与成员一一对应（378×672 / 472×840 / 568×1008），
+与 PyTorch 输出的最大误差 ≤ 8e-5。
+
 完整校验值、融合权重、每个成员的推理尺度见 [`weights/MANIFEST.json`](weights/MANIFEST.json)。
 下载：**[百度网盘](https://pan.baidu.com/s/1Iu5rxPz44ByAOzEznl4Exg?pwd=1234)（提取码 1234，链接长期有效）**。
-ONNX：`python export_onnx.py --member H2 --ckpt weights/H2_swins_15x_best.pt --out weights/H2_swins_15x.onnx`。
 
 > 权重不入 git（见 `.gitignore`），随 Release / 网盘分发。
 
@@ -102,14 +113,21 @@ ONNX：`python export_onnx.py --member H2 --ckpt weights/H2_swins_15x_best.pt --
 
 ```
 UAV-Crack-2026/
-├── ensemble.py         # 步骤 2：logit 加权融合 + 阈值 + 后处理 + 打包
+├── modelzoo.py         # 全部网络定义（Swin-UNet / SegFormer / DeepLabV3+ / U-Net-DS 等）
+├── trainz.py           # 训练主程序（Tversky / BCE-Dice / boundary 项、EMA、早停）
+├── predictz.py         # 单成员推理：多尺度 + 翻转 TTA，导出概率 npz
+├── evalz.py            # 本地评估（Crack IoU / mIoU / F1 / P / R）
+├── splits.py           # photo-disjoint 数据划分（按 source_photo_id 分组）
+├── metrics.py          # 指标实现
+├── config.py           # 路径与全局配置
+├── ensemble.py         # 融合精简版：AE 组合项 + logit 加权 + 阈值 + 去噪
 ├── check_result.py     # 提交格式自检（数量/尺寸/取值/命名/目录）
-├── export_onnx.py      # PyTorch -> ONNX（需 src/modelzoo.py）
+├── export_onnx.py      # PyTorch -> ONNX（--all 一次导 5 个）
+├── tools/              # 原始实验脚本（ensemble_test / blend / self_train / 阈值标定…）
+├── docs/               # 审题与选型、夜间冲刺日志、最终报告
 ├── configs/ensemble.json
-├── src/
-│   ├── fusion.py       # logit 加权平均 + AE 组合项
-│   └── postprocess.py  # 阈值 + 连通域去噪（<64 px）
-├── weights/            # 5 个 .pt + MANIFEST.json（不入库）
+├── src/{fusion,postprocess}.py
+├── weights/            # 5 个 .pt + 5 个 .onnx + MANIFEST.json（不入库）
 ├── requirements.txt
 ├── LICENSE             # MIT
 └── README.md
