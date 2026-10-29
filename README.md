@@ -1,4 +1,4 @@
-# UAV-Crack-2026 · 2026 VLP 挑战赛参赛作品
+﻿# UAV-Crack-2026 · 2026 VLP 挑战赛参赛作品
 
 长安大学人工智能创新大赛（2026）专项命题挑战赛 · **赛道 D：UAV-Crack 无人机路面裂缝分割**
 
@@ -93,7 +93,7 @@ python check_result.py --result result --data-root data/UAV-Crack-dataset --pack
 | `weights/H2_swins_15x_best.pt` | 199.1 MB | `17471427b0dd98ce` |
 
 完整校验值、融合权重、每个成员的推理尺度见 [`weights/MANIFEST.json`](weights/MANIFEST.json)。
-下载：[Hugging Face / 百度网盘链接（有效期 ≥90 天）](https://huggingface.co/)。
+下载：**[百度网盘](https://pan.baidu.com/s/1Iu5rxPz44ByAOzEznl4Exg?pwd=1234)（提取码 1234，链接长期有效）**。
 ONNX：`python export_onnx.py --member H2 --ckpt weights/H2_swins_15x_best.pt --out weights/H2_swins_15x.onnx`。
 
 > 权重不入 git（见 `.gitignore`），随 Release / 网盘分发。
