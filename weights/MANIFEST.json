@@ -1,0 +1,92 @@
+{
+ "ensemble": {
+  "fusion": "logit-weighted average",
+  "members": {
+   "AE_ms::ST_A": 0.04666666666666666,
+   "AE_ms::E_swins_prec": 0.3033333333333333,
+   "L4_unetd_100": 0.1,
+   "H_swins_hi": 0.25,
+   "H2_swins_15x": 0.3
+  },
+  "note": "AE_ms = logit(0.10*ST_A_ms + 0.65*E_ms) / 0.75，再以 0.35 权重参与最终融合",
+  "threshold": 0.495,
+  "postprocess": "remove connected components < 64 px",
+  "fg_policy": "0 for background, 1 for crack",
+  "local_metrics": {
+   "v1_CrackIoU": 0.6703,
+   "v1_mIoU": 0.8196,
+   "v2_CrackIoU": 0.6738,
+   "v2_mIoU": 0.8222
+  },
+  "online_metrics": {
+   "mIoU": 82.33,
+   "CrackF1": 80.3,
+   "CrackIoU": 67.08,
+   "CrackPrecision": 80.54,
+   "CrackRecall": 80.06,
+   "aAcc": 97.69
+  },
+  "leaderboard": "rank 2 / 74 (UAV-fyk v4, 2026-10-26)"
+ },
+ "members": [
+  {
+   "file": "weights/ST_A_best.pt",
+   "run": "ST_A",
+   "model_name": "swin_s",
+   "scales": [
+    0.85,
+    1.0,
+    1.15
+   ],
+   "role": "AE 合成成员（原生分辨率 + 伪标签自训练）",
+   "size_mb": 199.1,
+   "sha256": "824a1843889e60493906be933267e291d7ba5eee5a7a65b2741553a003ecdf5e"
+  },
+  {
+   "file": "weights/E_swins_prec_best.pt",
+   "run": "E_swins_prec",
+   "model_name": "swin_s",
+   "scales": [
+    0.85,
+    1.0,
+    1.15
+   ],
+   "role": "AE 合成成员（精确率偏置 Tversky α=0.7）",
+   "size_mb": 199.1,
+   "sha256": "b833f6ec26d43312fcd6c86947b0e0c4094cc0e54de25a1b634db98d6926e910"
+  },
+  {
+   "file": "weights/L4_unetd_100_best.pt",
+   "run": "L4_unetd_100",
+   "model_name": "unetd_r34",
+   "scales": [
+    1.0
+   ],
+   "role": "全分辨率解码 U-Net-DS，边界校正项",
+   "size_mb": 103.0,
+   "sha256": "a856b378caed584f4a0861f9a233b70c04601faa90e2dce420d40a21e3e51ed3"
+  },
+  {
+   "file": "weights/H_swins_hi_best.pt",
+   "run": "H_swins_hi",
+   "model_name": "swin_s",
+   "scales": [
+    1.25
+   ],
+   "role": "1.25× 从零训练的高分辨率 Swin-S",
+   "size_mb": 199.1,
+   "sha256": "5a680ed72d2ac9c0b8e68c337204cf4450383a472d3d080aabb285c91c3c6350"
+  },
+  {
+   "file": "weights/H2_swins_15x_best.pt",
+   "run": "H2_swins_15x",
+   "model_name": "swin_s",
+   "scales": [
+    1.5
+   ],
+   "role": "1.5× 从零训练的高分辨率 Swin-S（最强单模型 0.6620）",
+   "size_mb": 199.1,
+   "sha256": "17471427b0dd98ce248047269999c434edfb9634d8f50648832fdecb05b0c16a"
+  }
+ ]
+}

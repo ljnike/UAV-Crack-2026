@@ -1,0 +1,45 @@
+﻿UAV-Crack 2026 · 赛道 D · 方法 UAV-fyk v4 —— 模型权重说明
+==============================================================
+
+【这是什么】
+长安大学人工智能创新大赛（2026）专项命题挑战赛「赛道 D：UAV-Crack 无人机路面
+裂缝分割」参赛方法 UAV-fyk v4 的全部推理权重（5 个成员，PyTorch .pt）。
+线上成绩：mIoU 82.33、Crack F1 80.30、Crack IoU 67.08、Precision 80.54、
+Recall 80.06、aAcc 97.69（2026-10-28 榜单第 5 / 79，提交时为第 2 / 74）。
+
+【文件清单】
+文件名                        大小     结构        推理尺度      融合权重
+ST_A_best.pt                  199.1 MB swin_s      0.85/1.0/1.15 0.0467
+E_swins_prec_best.pt          199.1 MB swin_s      0.85/1.0/1.15 0.3033
+L4_unetd_100_best.pt          103.0 MB unetd_r34   1.0           0.1000
+H_swins_hi_best.pt            199.1 MB swin_s      1.25          0.2500
+H2_swins_15x_best.pt          199.1 MB swin_s      1.5           0.3000
+
+合计 5 个 .pt，约 899 MB；另附 MANIFEST.json（完整元数据）与本说明。
+
+【怎么用】
+1) 校验完整性（Windows PowerShell，逐条应输出相同哈希）：
+     Get-FileHash .\ST_A_best.pt -Algorithm SHA256
+   5 个文件的预期 SHA256 见同目录 SHA256SUMS.txt。
+2) 推理需要配套代码（encoder/decoder 定义、predictz.py、ensemble.py）：
+     https://github.com/<GitHub 用户名>/UAV-Crack-2026
+3) 关键点（用错会掉 5–12 个 IoU 点）：
+     · 每个成员必须用自己的推理尺度（见上表），不是统一 1.0；
+     · 融合在 logit 域做加权平均，权重见上表与 MANIFEST.json；
+     · 阈值 0.495，去除面积 < 64 px 的连通域；
+     · 输出 PNG 必须单通道、取值 0/1（0=路面，1=裂缝），文件名与输入一致。
+
+【校验值】
+  824a1843889e60493906be933267e291d7ba5eee5a7a65b2741553a003ecdf5e  ST_A_best.pt
+  b833f6ec26d43312fcd6c86947b0e0c4094cc0e54de25a1b634db98d6926e910  E_swins_prec_best.pt
+  a856b378caed584f4a0861f9a233b70c04601faa90e2dce420d40a21e3e51ed3  L4_unetd_100_best.pt
+  5a680ed72d2ac9c0b8e68c337204cf4450383a472d3d080aabb285c91c3c6350  H_swins_hi_best.pt
+  17471427b0dd98ce248047269999c434edfb9634d8f50648832fdecb05b0c16a  H2_swins_15x_best.pt
+
+【许可与用途】
+权重仅供 2026 VLP 挑战赛评审与非商业研究使用；数据集 UAV-CrackX 遵循
+CC BY-NC-SA 3.0，禁止二次分发。代码以 MIT 许可开源。
+
+【联系】
+队名：Yolo    负责人：刘永基    学院：能源与电气工程学院
+指导教师：宣亮    日期：2026-10-28

@@ -1,0 +1,94 @@
+{
+  "task": "UAV-Crack",
+  "method": "UAV-fyk v4",
+  "fusion": "logit-weighted average (weights apply in the logit domain)",
+  "members": [
+    {
+      "id": "ST_A",
+      "file": "weights/ST_A_best.pt",
+      "model": "swin_s",
+      "params_m": 49.67,
+      "train_size": [384, 672],
+      "infer_scales": [0.85, 1.0, 1.15],
+      "role": "AE 组合项成员：软伪标签自训练（pseudo_weight 0.5, lr 5e-5, 10 epochs）",
+      "ae_share": 0.10,
+      "final_weight": 0.04667,
+      "ema_val_iou": 0.6346
+    },
+    {
+      "id": "E",
+      "file": "weights/E_swins_prec_best.pt",
+      "model": "swin_s",
+      "params_m": 49.67,
+      "train_size": [384, 672],
+      "infer_scales": [0.85, 1.0, 1.15],
+      "role": "AE 组合项成员：精确率偏置 Tversky(0.7, 0.3)，boundary_weight 0.2",
+      "ae_share": 0.65,
+      "final_weight": 0.30333,
+      "ema_val_iou": 0.6288
+    },
+    {
+      "id": "L4",
+      "file": "weights/L4_unetd_100_best.pt",
+      "model": "unetd_r34",
+      "params_m": 25.71,
+      "train_size": [384, 672],
+      "infer_scales": [1.0],
+      "role": "U-Net-DS（ResNet34 编码器）全分辨率解码，边界校正",
+      "final_weight": 0.10,
+      "ema_val_iou": 0.5599
+    },
+    {
+      "id": "H",
+      "file": "weights/H_swins_hi_best.pt",
+      "model": "swin_s",
+      "params_m": 49.67,
+      "train_size": [480, 840],
+      "infer_scales": [1.25],
+      "role": "1.25× 高分辨率从零训练 Swin-S",
+      "final_weight": 0.25,
+      "raw_val_iou": 0.6259
+    },
+    {
+      "id": "H2",
+      "file": "weights/H2_swins_15x_best.pt",
+      "model": "swin_s",
+      "params_m": 49.67,
+      "train_size": [568, 1008],
+      "infer_scales": [1.5],
+      "role": "1.5× 高分辨率从零训练 Swin-S（最强单模型）",
+      "final_weight": 0.30,
+      "ema_val_iou": 0.6469
+    }
+  ],
+  "ae_synthesis": {
+    "note": "AE_ms = logit(0.10 * ST_A_ms + 0.65 * E_ms) / 0.75，整体再以 0.35 权重进入最终融合",
+    "shares": {"ST_A": 0.10, "E": 0.65},
+    "group_weight": 0.35
+  },
+  "w": {"L4": 0.10, "H": 0.25, "H2": 0.30},
+  "threshold": 0.495,
+  "min_component_area_px": 64,
+  "output": {
+    "dtype": "uint8",
+    "values": [0, 1],
+    "extension": ".png",
+    "layout": "result/<same basename as leftimg8bit/val>"
+  },
+  "local_eval": {
+    "v1": {"crack_iou": 0.6703, "miou": 0.8196},
+    "v2": {"crack_iou": 0.6738, "miou": 0.8222},
+    "best_single_with_tta": 0.6620
+  },
+  "leaderboard": {
+    "snapshot": "2026-10-28",
+    "submitted_rank": "2 / 74",
+    "current_rank": "5 / 79",
+    "mIoU": 82.33,
+    "crack_f1": 80.30,
+    "crack_iou": 67.08,
+    "crack_precision": 80.54,
+    "crack_recall": 80.06,
+    "aAcc": 97.69
+  }
+}
