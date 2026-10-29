@@ -3,8 +3,9 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+sub/
 
-# 权重与数据不入库（权重走 Release / 网盘）
+# weights and data are distributed out-of-band (netdisk / release)
 weights/*.pth
 weights/*.pt
 weights/*.onnx
