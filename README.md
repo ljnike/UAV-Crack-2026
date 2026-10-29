@@ -1,4 +1,4 @@
-# UAV-Crack-2026 · 2026 VLP 挑战赛参赛作品
+﻿# UAV-Crack-2026 · 2026 VLP 挑战赛参赛作品
 
 长安大学人工智能创新大赛（2026）专项命题挑战赛 · **赛道 D：UAV-Crack 无人机路面裂缝分割**
 
@@ -124,7 +124,6 @@ UAV-Crack-2026/
 ├── check_result.py     # 提交格式自检（数量/尺寸/取值/命名/目录）
 ├── export_onnx.py      # PyTorch -> ONNX（--all 一次导 5 个）
 ├── tools/              # 原始实验脚本（ensemble_test / blend / self_train / 阈值标定…）
-├── docs/               # 审题与选型、夜间冲刺日志、最终报告
 ├── configs/ensemble.json
 ├── src/{fusion,postprocess}.py
 ├── weights/            # 5 个 .pt + 5 个 .onnx + MANIFEST.json（不入库）
