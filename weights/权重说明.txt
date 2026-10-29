@@ -22,7 +22,7 @@ H2_swins_15x_best.pt          199.1 MB swin_s      1.5           0.3000
      Get-FileHash .\ST_A_best.pt -Algorithm SHA256
    5 个文件的预期 SHA256 见同目录 SHA256SUMS.txt。
 2) 推理需要配套代码（encoder/decoder 定义、predictz.py、ensemble.py）：
-     https://github.com/<GitHub 用户名>/UAV-Crack-2026
+     https://github.com/ljnike/UAV-Crack-2026
 3) 关键点（用错会掉 5–12 个 IoU 点）：
      · 每个成员必须用自己的推理尺度（见上表），不是统一 1.0；
      · 融合在 logit 域做加权平均，权重见上表与 MANIFEST.json；
@@ -43,3 +43,5 @@ CC BY-NC-SA 3.0，禁止二次分发。代码以 MIT 许可开源。
 【联系】
 队名：Yolo    负责人：刘永基    学院：能源与电气工程学院
 指导教师：宣亮    日期：2026-10-28
+
+
